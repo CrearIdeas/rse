@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crear Ideas - Certificacion ESR</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Montserrat, Arial, sans-serif; background: #1C4B9E; }
+
+#pantalla-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1C4B9E;
+}
+#pantalla-app {
+  display: none;
+  height: 100vh;
+  flex-direction: row;
+  background: #F5F7FC;
+}
+
+.tarjeta {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 400px;
+  max-width: 92vw;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.logo-ci {
+  width: 64px; height: 64px;
+  background: #1C4B9E;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1rem;
+  border: 2px solid #8B2032;
+}
+.logo-ci span { color: white; font-size: 20px; font-weight: 700; }
+.titulo { text-align: center; font-size: 22px; font-weight: 700; color: #1C4B9E; margin-bottom: 4px; }
+.subtitulo { text-align: center; font-size: 12px; color: #5A6A8A; margin-bottom: 1.5rem; }
+
+.tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; }
+.tab {
+  flex: 1; padding: 9px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(28,75,158,0.3);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab.activo { background: #1C4B9E; color: white; border-color: #1C4B9E; }
+.tab.inactivo { background: white; color: #5A6A8A; }
+
+.campo { margin-bottom: 1rem; }
+.campo label { display: block; font-size: 11px; font-weight: 600; color: #5A6A8A; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+.campo input {
+  width: 100%; padding: 10px 14px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(28,75,158,0.2);
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: 14px; color: #1C2B4A;
+  outline: none;
+}
+.campo input:focus { border-color: #1C4B9E; }
+
+.btn-ingresar {
+  width: 100%; padding: 12px;
+  background: #1C4B9E; color: white;
+  border: none; border-radius: 8px;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+.btn-ingresar:hover { background: #163D85; }
+
+/* APP */
+.sidebar {
+  width: 280px;
+  background: #1C4B9E;
+  display: flex; flex-direction: column;
+  color: white;
+  overflow-y: auto;
+}
+.sb-header { padding: 1.5rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.sb-logo { font-size: 17px; font-weight: 700; }
+.sb-user { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.sb-badge {
+  display: inline-block;
+  background: rgba(139,32,50,0.3);
+  border: 1px solid rgba(139,32,50,0.5);
+  color: #F5C6CE;
+  font-size: 10px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  margin-top: 8px; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.sb-prog { padding: 1rem 1.25rem; }
+.sb-prog-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.sb-prog-bar { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+.sb-prog-fill { height: 100%; background: #8B2032; border-radius: 2px; transition: width 0.5s; }
+.sb-prog-pct { font-size: 12px; color: #F5C6CE; font-weight: 600; margin-top: 5px; }
+
+.sb-nav { flex: 1; padding: 0.5rem 0; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0.65rem 1.25rem;
+  cursor: pointer;
+  border-right: 3px solid transparent;
+  transition: all 0.15s;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); }
+.nav-item.activo { background: rgba(139,32,50,0.2); border-right-color: #8B2032; }
+.nav-item.bloqueado { opacity: 0.35; cursor: not-allowed; }
+.nav-item.completado .nav-num { background: #2D7A4F !important; }
+.nav-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6);
+  flex-shrink: 0;
+}
+.nav-item.activo .nav-num { background: #8B2032; color: white; }
+.nav-titulo { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.3; }
+.nav-item.activo .nav-titulo { color: white; font-weight: 500; }
+
+.sb-footer { padding: 1rem 1.25rem; border-top: 1px solid rgba(255,255,255,0.1); }
+.sb-link {
+  display: block; font-size: 12px; color: rgba(255,255,255,0.4);
+  cursor: pointer; background: none; border: none;
+  font-family: Montserrat, Arial, sans-serif;
+  text-align: left; padding: 4px 0; width: 100%;
+  transition: color 0.15s;
+}
+.sb-link:hover { color: rgba(255,255,255,0.7); }
+
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar {
+  background: white; border-bottom: 1px solid rgba(28,75,158,0.1);
+  padding: 1rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.top-titulo { font-size: 20px; font-weight: 700; color: #1C4B9E; font-family: Montserrat, Arial, sans-serif; }
+.top-meta { font-size: 12px; color: #5A6A8A; margin-top: 2px; }
+.chip {
+  display: inline-block; padding: 4px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 500;
+}
+.chip-fecha { background: #FDF0F2; color: #8B2032; }
+.chip-ok { background: #E8F5EE; color: #2D7A4F; }
+.chip-pending { background: #EDE9E0; color: #5A6A8A; }
+
+.contenido { flex: 1; overflow-y: auto; padding: 1.75rem 2rem; }
+
+.mod-header {
+  background: white; border-radius: 14px;
+  border: 1px solid rgba(28,75,158,0.1);
+  padding: 1.5rem; margin-bottom: 1.25rem;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(28,75,158,0.06);
+}
+.mod-session { font-size: 11px; color: #5A6A8A; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 4px; }
+.mod-titulo { font-size: 22px; font-weight: 700; color: #1C4B9E; line-height: 1.3; }
+.mod-sub { font-size: 14px; color: #5A6A8A; margin-top: 6px; }
+.mod-entregable {
+  font-size: 12px; color: #8B2032; background: #FDF0F2;
+  padding: 4px 10px; border-radius: 20px; display: inline-block; margin-top: 8px; font-weight: 500;
+}
+.mod-horas { font-size: 36px; font-weight: 700; color: #1C4B9E; line-height: 1; }
+.mod-horas-label { font-size: 11px; color: #5A6A8A; }
+
+.material-card {
+  background: white; border-radius: 14px;
+  border: 1px solid rgba(28,75,158,0.1);
+  padding: 1.25rem; margin-bottom: 1.25rem;
+  box-shadow: 0 2px 12px rgba(28,75,158,0.06);
+}
+.section-label { font-size: 11px; font-weight: 700; color: #5A6A8A; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+.mat-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 8px;
+  border: 1px solid rgba(28,75,158,0.1);
+  cursor: pointer; transition: all 0.15s; margin-bottom: 8px;
+}
+.mat-item:hover { border-color: #1C4B9E; background: #E8EDF8; }
+.mat-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.mat-titulo { font-size: 14px; font-weight: 500; color: #1C2B4A; }
+.mat-desc { font-size: 12px; color: #5A6A8A; margin-top: 2px; }
+.mat-abrir { font-size: 12px; color: #5A6A8A; margin-left: auto; }
+
+.actividades { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+.act-card {
+  background: white; border-radius: 14px;
+  border: 1px solid rgba(28,75,158,0.1);
+  padding: 1.25rem;
+  box-shadow: 0 2px 12px rgba(28,75,158,0.06);
+  display: flex; flex-direction: column; gap: 10px;
+  transition: all 0.2s;
+}
+.act-card:hover { border-color: #1C4B9E; }
+.act-card.hecho { border-color: rgba(45,122,79,0.3); background: #FAFDFB; }
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.badge-diag { background: #FDF0F2; color: #8B2032; }
+.badge-res { background: #FEF3C7; color: #B45309; }
+.badge-ent { background: #EDE9E0; color: #1C2B4A; }
+.badge-ok { background: #E8F5EE; color: #2D7A4F; }
+.act-titulo { font-size: 15px; font-weight: 600; color: #1C2B4A; }
+.act-desc { font-size: 13px; color: #5A6A8A; line-height: 1.5; flex: 1; }
+.act-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 10px; border-top: 1px solid rgba(28,75,158,0.08);
+  margin-top: auto;
+}
+.act-estado { font-size: 12px; color: #5A6A8A; font-weight: 500; }
+.act-estado.hecho { color: #2D7A4F; }
+.btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 8px; font-family: Montserrat, Arial, sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; transition: all 0.2s; }
+.btn-azul { background: #1C4B9E; color: white; }
+.btn-azul:hover { background: #163D85; }
+.btn-verde { background: #E8F5EE; color: #2D7A4F; border: 1px solid rgba(45,122,79,0.25); }
+.btn-verde:hover { background: #2D7A4F; color: white; }
+.btn-rojo { background: #FDF0F2; color: #8B2032; border: 1px solid rgba(139,32,50,0.25); }
+
+.barra-completar {
+  background: white; border-top: 1px solid rgba(28,75,158,0.1);
+  padding: 1rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.pasos { display: flex; gap: 4px; }
+.paso {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #EDE9E0; transition: background 0.3s;
+}
+.paso.hecho { background: #2D7A4F; }
+.paso.pendiente { background: #B45309; }
+.completar-label { font-size: 13px; color: #5A6A8A; }
+.btn-completar {
+  padding: 10px 24px; background: #8B2032; color: white;
+  border: none; border-radius: 8px;
+  font-family: Montserrat, Arial, sans-serif;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-completar:hover { background: #6A1726; }
+.btn-completar:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.modal-fondo {
+  display: none; position: fixed; inset: 0;
+  background: rgba(28,35,50,0.65);
+  z-index: 100; align-items: center; justify-content: center;
+}
+.modal-fondo.abierto { display: flex; }
+.modal-caja {
+  background: white; border-radius: 20px; padding: 2.25rem;
+  width: 420px; max-width: 92vw; text-align: center;
+}
+.modal-icono { font-size: 52px; margin-bottom: 1rem; }
+.modal-titulo { font-size: 24px; font-weight: 700; color: #1C4B9E; margin-bottom: 8px; }
+.modal-cuerpo { font-size: 14px; color: #5A6A8A; line-height: 1.6; margin-bottom: 1.75rem; }
+.modal-btns { display: flex; gap: 10px; }
+.btn-modal1 { flex: 1; padding: 11px; border: 1.5px solid rgba(28,75,158,0.2); background: white; border-radius: 8px; font-family: Montserrat, Arial, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; color: #1C2B4A; }
+.btn-modal2 { flex: 1; padding: 11px; background: #8B2032; color: white; border: none; border-radius: 8px; font-family: Montserrat, Arial, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+.toast {
+  position: fixed; bottom: 1.75rem; right: 1.75rem;
+  background: #1C2B4A; color: white;
+  padding: 12px 18px; border-radius: 10px;
+  font-size: 13px; z-index: 500;
+  border-left: 3px solid #8B2032;
+  max-width: 320px; line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .sidebar { width: 220px; }
+  .actividades { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .sidebar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="pantalla-login">
+  <div class="tarjeta">
+    <div class="logo-ci"><span>CI</span></div>
+    <div class="titulo">Crear Ideas ESR</div>
+    <div class="subtitulo">Certificacion RSE - CEMEFI - Coparmex</div>
+
+    <div class="tabs">
+      <button class="tab activo" id="tab-alumno" onclick="cambiarRol('alumno')">Alumno</button>
+      <button class="tab inactivo" id="tab-inst" onclick="cambiarRol('instructor')">Instructor</button>
+    </div>
+
+    <div class="campo" id="campo-nombre">
+      <label>Nombre completo</label>
+      <input type="text" id="inp-nombre" placeholder="Tu nombre completo">
+    </div>
+    <div class="campo" id="campo-emp">
+      <label>Empresa</label>
+      <input type="text" id="inp-emp" placeholder="Nombre de tu empresa">
+    </div>
+
+    <button class="btn-ingresar" onclick="entrar()">Ingresar a la plataforma</button>
+  </div>
+</div>
+
+<div id="pantalla-app">
+  <aside class="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo">Crear Ideas ESR</div>
+      <div class="sb-user" id="sb-usuario">-</div>
+      <div class="sb-badge" id="sb-rol">Alumno</div>
+    </div>
+    <div class="sb-prog">
+      <div class="sb-prog-label">Progreso general</div>
+      <div class="sb-prog-bar"><div class="sb-prog-fill" id="prog-barra" style="width:0%"></div></div>
+      <div class="sb-prog-pct" id="prog-texto">0% completado</div>
+    </div>
+    <nav class="sb-nav" id="sb-nav"></nav>
+    <div class="sb-footer">
+      <button class="sb-link" onclick="verRubrica()">Rubrica Coparmex</button>
+      <button class="sb-link" id="link-panel" style="display:none" onclick="verPanel()">Panel instructor</button>
+      <button class="sb-link" onclick="salir()">Cerrar sesion</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="top-titulo" id="top-titulo">Modulo 1</div>
+        <div class="top-meta" id="top-meta">-</div>
+      </div>
+      <div>
+        <span class="chip chip-fecha" id="top-fecha">-</span>
+        <span class="chip chip-pending" id="top-estado" style="margin-left:8px;">-</span>
+      </div>
+    </div>
+    <div class="contenido" id="contenido"></div>
+    <div class="barra-completar" id="barra-completar">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="pasos" id="pasos-mini"></div>
+        <div class="completar-label" id="completar-label">Completa todas las actividades</div>
+      </div>
+      <button class="btn-completar" id="btn-completar" onclick="completarModulo()" disabled>Completar modulo</button>
+    </div>
+  </main>
+</div>
+
+<div class="modal-fondo" id="modal">
+  <div class="modal-caja">
+    <div class="modal-icono" id="m-icono">🏆</div>
+    <div class="modal-titulo" id="m-titulo">Modulo completado</div>
+    <div class="modal-cuerpo" id="m-cuerpo">-</div>
+    <div class="modal-btns">
+      <button class="btn-modal1" onclick="cerrarModal()">Ver rubrica</button>
+      <button class="btn-modal2" onclick="siguienteModulo()">Siguiente modulo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var ROL = 'alumno';
+var USUARIO = '';
+var EMPRESA = '';
+var MOD_ACTUAL = 0;
+
+var MODULOS = [
+  { num:1, titulo:'RSE y Modelo ASG', sesion:'Responsabilidad Social Empresarial', sub:'Ambiental, Social y Gobernanza - Distintivo CEMEFI', fecha:'26/03/2026', horas:1, entregable:'1 Video y Material inicial PPT',
+    material:[
+      {tipo:'video', titulo:'Intro RSE y Modelo ASG', desc:'Video de introduccion a la sesion 1', url:'https://drive.google.com/file/d/1v_noPEtvuLgcyNuFy7sTDN8tuJSTE2oX/view?usp=sharing'},
+      {tipo:'ppt', titulo:'Presentacion RSE - CEMEFI', desc:'Material PPT de la sesion', url:'https://drive.google.com/file/d/1IdlQ2wbN6iVcYnqH952hkYE4M2t0Ly0P/view?usp=sharing'},
+      {tipo:'doc', titulo:'Guia Distintivo ESR', desc:'Documento oficial CEMEFI', url:'https://drive.google.com/file/d/1Nn-cKs76C5Z6CmQc4AjPv6ukop-WHgWI/view?usp=sharing'}
+    ],
+    formDiag:'https://docs.google.com/forms/d/1yHpAuQQ6pHj3145U-3zRqQkuDrMOjwyuWzxpD-zsDps/viewform',
+    formRes:'https://docs.google.com/forms/d/1p4oFn06yigIQvpAzIvuzOJfH_eiNh0QAdqNB3vYIphc/viewform',
+    carpeta:'https://drive.google.com/drive/folders/1zyDrehrodQ706dtXLy1sYUphG7UpTPB2'
+  },
+  { num:2, titulo:'Materialidad y Stakeholders', sesion:'Responsabilidad Social Empresarial', sub:'Grupos de interes y diagnostico inicial', fecha:'26/03/2026', horas:1, entregable:'Caso GAP + Diagnostico de Materialidad', material:[{tipo:'video',titulo:'Grupos de interes',desc:'Metodologia stakeholders',url:''},{tipo:'ppt',titulo:'Matriz de Materialidad',desc:'Plantilla y guia',url:''},{tipo:'doc',titulo:'Caso GAP Inc.',desc:'Lectura base para entregable',url:''}], formDiag:'https://docs.google.com/forms/d/1Tj7nMk6QnnJeChVtYnigjZXqf1A6KP-BRFxY4dNlk18/viewform', formRes:'https://docs.google.com/forms/d/1YruSY-jOlAHOF-on9nfOeJHP8u4O_xHskHNfsmWTagA/viewform', carpeta:'https://drive.google.com/drive/folders/1RXoaceYQc-DQ7-QuALZZL-eBh9UXUBr_'},
+  { num:3, titulo:'Comite ASG en la Empresa', sesion:'Responsabilidad Social Empresarial', sub:'Estructura y roles del comite', fecha:'31/03/2026', horas:1, entregable:'Formato de constitucion del Comite ASG', material:[{tipo:'video',titulo:'Constituir un Comite ASG',desc:'Guia paso a paso',url:''},{tipo:'doc',titulo:'Roles del Comite ASG',desc:'Manual de funciones',url:''},{tipo:'ppt',titulo:'Formato de constitucion',desc:'Plantilla oficial',url:''}], formDiag:'https://docs.google.com/forms/d/1d39s3yLfRZBgCMk74x_8TGOqNAnKGqkyA5iD2gkVW2w/viewform', formRes:'https://docs.google.com/forms/d/1woV1hBJxFe6Bmfv9scxtQyU6vZpLLR4QtxS2XM40X2U/viewform', carpeta:'https://drive.google.com/drive/folders/17B-WN3qvld0HbAXGojD3uqHA-c16ggcO'},
+  { num:4, titulo:'Proceso del Distintivo ESR', sesion:'Distintivo de ESR', sub:'Plataforma CEMEFI y procedimiento', fecha:'31/03/2026', horas:1, entregable:'Video-Tutorial CEMEFI', material:[{tipo:'video',titulo:'Tutorial Plataforma CEMEFI',desc:'Recorrido completo',url:''},{tipo:'doc',titulo:'Guia de postulacion',desc:'Pasos y plazos',url:''},{tipo:'ppt',titulo:'Criterios de evaluacion',desc:'Puntajes CEMEFI',url:''}], formDiag:'https://docs.google.com/forms/d/16urL-JOAN89OOX-E4sESB8qj2Ol1M_KCf2W6f4GpIHk/viewform', formRes:'https://docs.google.com/forms/d/1NXb4iAD7ZE1rQTQxQ8MwfknK0LRvdKdjWqwp4Q_ktqM/viewform', carpeta:'https://drive.google.com/drive/folders/1EffqSuNL2ADS7B19lndpFbuWquSKJ7OU'},
+  { num:5, titulo:'Niveles de Desarrollo y Evidencias', sesion:'Distintivo de ESR', sub:'Sistema de Gestion CEMEFI Niveles 1-5', fecha:'15/04/2026', horas:1, entregable:'Plan Estrategico + Politicas + Codigo de Etica', material:[{tipo:'video',titulo:'Los 5 Niveles CEMEFI',desc:'Explicacion detallada',url:''},{tipo:'doc',titulo:'Ejemplos por giro FEMSA',desc:'Servicios, Comercio e Industria',url:''},{tipo:'ppt',titulo:'Guia de evidencias',desc:'Tabla por nivel',url:''}], formDiag:'https://docs.google.com/forms/d/1kGmAO7y7Fdq9Tp_rApRigXSIm3ljSjDZkbuD8IjZLt0/viewform', formRes:'https://docs.google.com/forms/d/1g51uv2Oo53eixl8vZxRuCVfEHtoAEPpJ1L-tmAPaXXc/viewform', carpeta:'https://drive.google.com/drive/folders/1nak6gstqb9M4CP05xtOA8XDWvxq6nqmq'},
+  { num:6, titulo:'Ambito 1: Ambiente y Ambito 2: Derechos Laborales', sesion:'Criterios ASG', sub:'Ambiental, Social y Gobernanza', fecha:'21/04/2026', horas:1, entregable:'Entregables de materialidad', material:[{tipo:'video',titulo:'Gestion ambiental',desc:'Criterios CEMEFI ambientales',url:''},{tipo:'doc',titulo:'Derechos laborales',desc:'Bienestar y NMX-R-025',url:''},{tipo:'ppt',titulo:'Indicadores clave',desc:'KPIs ambito 1 y 2',url:''}], formDiag:'https://docs.google.com/forms/d/1eCBp5UUbp9fOSJXB35MgU9wjl_yOpSIpuzBCW94lyko/viewform', formRes:'https://docs.google.com/forms/d/1YDKqKDaBcPf7AtvuwxzlG_B_Sm4eEMBYuOnxP7GD2H0/viewform', carpeta:'https://drive.google.com/drive/folders/1jCIXniWIkXCxbpEdfAzk8nb7dmnJ9zJI'},
+  { num:7, titulo:'Ambito 3: Consumidores y Ambito 4: Cadena de Valor', sesion:'Criterios ASG', sub:'Consumidores y proveedores', fecha:'21/04/2026', horas:1, entregable:'Entregables de materialidad', material:[{tipo:'video',titulo:'RSE hacia consumidores',desc:'Transparencia y calidad',url:''},{tipo:'doc',titulo:'Cadena de valor sostenible',desc:'Criterios ASG en proveedores',url:''},{tipo:'ppt',titulo:'Compra responsable',desc:'Evaluacion de proveedores',url:''}], formDiag:'https://docs.google.com/forms/d/1hfMi3ZVgp63LohKpM3Yfmf1O86sFl7tyCfrtdRySTbg/viewform', formRes:'https://docs.google.com/forms/d/1FprbT_ztSHBrTpJ0AMzS3IY0_q8M7XgT9qK4GxiPeko/viewform', carpeta:'https://drive.google.com/drive/folders/1tF00-Lga-ISb9EjpXIDaH9tA3hp3uf8g'},
+  { num:8, titulo:'Ambito 5: Participacion y Ambito 6: Gestion RSE', sesion:'Criterios ASG', sub:'Comunidad y gestion estrategica', fecha:'06/05/2026', horas:1, entregable:'Entregables de materialidad', material:[{tipo:'video',titulo:'Participacion comunitaria',desc:'Inversion social',url:''},{tipo:'doc',titulo:'Gestion estrategica RSE',desc:'Integracion corporativa',url:''},{tipo:'ppt',titulo:'Indicadores ODS',desc:'Metricas de impacto',url:''}], formDiag:'https://docs.google.com/forms/d/1CgnTTiwH0Ho26mFEP8RVE83BZzhR3PMjDSjLVLkV4II/viewform', formRes:'https://docs.google.com/forms/d/1HQInWtyTUiOkbzi8DznyKdylcT6K35u3gGb0n72cVM4/viewform', carpeta:'https://drive.google.com/drive/folders/1tnUuN-hlx6cce6OxmhwShZ_lW5KqeaA3'},
+  { num:9, titulo:'Ambito 7: Gobernanza y Ambito 8: DDHH', sesion:'Criterios ASG', sub:'Practicas justas y Derechos Humanos', fecha:'06/05/2026', horas:1, entregable:'Entregables de materialidad', material:[{tipo:'video',titulo:'Gobernanza corporativa',desc:'Etica y anticorrupcion',url:''},{tipo:'doc',titulo:'DDHH en la empresa',desc:'Principios Rectores ONU',url:''},{tipo:'ppt',titulo:'Codigo de Etica',desc:'Implementacion y denuncias',url:''}], formDiag:'https://docs.google.com/forms/d/1shoXuqSdMNlTiT4VcZHYJYzWdzmlXIRtPBEL05nHyfo/viewform', formRes:'https://docs.google.com/forms/d/1yyqZPbmJmlO8DF9LQ_Q4FNg9dBlbTbPSUZQ0T9fndmA/viewform', carpeta:'https://drive.google.com/drive/folders/1cpYE3PC-Okxverkypeu701UYdcrFwscU'},
+  { num:10, titulo:'Ambito 9: Variables Globales y Revision', sesion:'Criterios ASG', sub:'Variables globales y los 9 ambitos', fecha:'13/05/2026', horas:1, entregable:'Entregables de materialidad', material:[{tipo:'video',titulo:'Variables globales y ODS',desc:'Cambio climatico e inclusion',url:''},{tipo:'doc',titulo:'Revision 9 ambitos CEMEFI',desc:'Brechas y oportunidades',url:''},{tipo:'ppt',titulo:'Dashboard ASG',desc:'Semaforo por ambito',url:''}], formDiag:'https://docs.google.com/forms/d/1fs1qLEpRYIIXdDe-mxCHrK8PMc37JcYRlwSc9n0Wx9s/viewform', formRes:'https://docs.google.com/forms/d/1w8VGzmDlQesa3OiUGMqu2_--AP2UHAgDysTRgo__a3Y/viewform', carpeta:'https://drive.google.com/drive/folders/1J4Efad3_RAXoiYdlSnGNx9cUcne8MM6O'},
+  { num:11, titulo:'Sesion de Revision y Cierre', sesion:'Sesion de Revision Final', sub:'Portafolio de evidencias y consolidacion', fecha:'13/05/2026', horas:1, entregable:'Portafolio completo de evidencias RSE', material:[{tipo:'video',titulo:'Cierre del programa',desc:'Revision y proximos pasos',url:''},{tipo:'doc',titulo:'Checklist final CEMEFI',desc:'Verificacion de evidencias',url:''},{tipo:'ppt',titulo:'Plan de accion post-formacion',desc:'Hoja de ruta RSE',url:''}], formDiag:'https://docs.google.com/forms/d/1hfFmYX3tEmT19ZKHJAOSmNg82Q_uDFlIXJD_4awQTVM/viewform', formRes:'https://docs.google.com/forms/d/1uJeDuSas2btv2oKE2eUhyz0dLG2AgiNtHxstDfNdOkY/viewform', carpeta:'https://drive.google.com/drive/folders/1w1RdU9YNzKsHWiWajHqzBcOpuzje20QL'}
+];
+
+var ESTADO = MODULOS.map(function(m, i) {
+  return { desbloqueado: i === 0, completado: false, diag: false, res: false, entregable: false };
+});
+
+var ALUMNOS = [];
+
+function cambiarRol(rol) {
+  ROL = rol;
+  document.getElementById('tab-alumno').className = 'tab ' + (rol === 'alumno' ? 'activo' : 'inactivo');
+  document.getElementById('tab-inst').className   = 'tab ' + (rol === 'instructor' ? 'activo' : 'inactivo');
+  document.getElementById('campo-emp').style.display = rol === 'instructor' ? 'none' : '';
+  if (rol === 'instructor') {
+    document.getElementById('inp-nombre').value = 'Maricela Soto Macias';
+  } else {
+    document.getElementById('inp-nombre').value = '';
+  }
+}
+
+function entrar() {
+  var nombre = document.getElementById('inp-nombre').value.trim();
+  var empresa = document.getElementById('inp-emp') ? document.getElementById('inp-emp').value.trim() : '';
+
+  if (ROL === 'alumno') {
+    if (!nombre)  { alert('Escribe tu nombre'); return; }
+    if (!empresa) { alert('Escribe tu empresa'); return; }
+    USUARIO = nombre;
+    EMPRESA = empresa;
+  } else {
+    USUARIO = nombre || 'Maricela Soto Macias';
+    EMPRESA = 'Crear Ideas - Instructora';
+  }
+
+  document.getElementById('sb-usuario').textContent = USUARIO + ' - ' + EMPRESA;
+  document.getElementById('sb-rol').textContent = ROL === 'instructor' ? 'Instructora' : 'Alumno';
+
+  if (ROL === 'instructor') {
+    document.getElementById('link-panel').style.display = '';
+    document.getElementById('barra-completar').style.display = 'none';
+  }
+
+  document.getElementById('pantalla-login').style.display = 'none';
+  document.getElementById('pantalla-app').style.display = 'flex';
+
+  construirNav();
+  verModulo(0);
+}
+
+function salir() {
+  document.getElementById('pantalla-app').style.display = 'none';
+  document.getElementById('pantalla-login').style.display = 'flex';
+  ROL = 'alumno';
+  cambiarRol('alumno');
+}
+
+function construirNav() {
+  var nav = document.getElementById('sb-nav');
+  nav.innerHTML = '';
+  MODULOS.forEach(function(m, i) {
+    var e = ESTADO[i];
+    var cls = 'nav-item';
+    if (!e.desbloqueado && ROL !== 'instructor') cls += ' bloqueado';
+    if (e.completado) cls += ' completado';
+    if (i === MOD_ACTUAL) cls += ' activo';
+    var numTexto = e.completado ? '&#10003;' : (i + 1);
+    nav.innerHTML += '<div class="' + cls + '" onclick="clickNav(' + i + ')">' +
+      '<div class="nav-num">' + numTexto + '</div>' +
+      '<div class="nav-titulo">' + m.titulo + '</div>' +
+      '</div>';
+  });
+  var completados = ESTADO.filter(function(e){ return e.completado; }).length;
+  var pct = Math.round((completados / 11) * 100);
+  document.getElementById('prog-barra').style.width = pct + '%';
+  document.getElementById('prog-texto').textContent = pct + '% completado - ' + completados + '/11 modulos';
+}
+
+function clickNav(i) {
+  if (!ESTADO[i].desbloqueado && ROL !== 'instructor') {
+    mostrarToast('Completa el modulo anterior para desbloquear este.');
+    return;
+  }
+  verModulo(i);
+}
+
+function verModulo(i) {
+  MOD_ACTUAL = i;
+  var m = MODULOS[i];
+  var e = ESTADO[i];
+  construirNav();
+
+  document.getElementById('top-titulo').textContent = 'Modulo ' + m.num + ' - ' + m.titulo;
+  document.getElementById('top-meta').textContent = m.sesion + ' - ' + m.horas + 'h';
+  document.getElementById('top-fecha').textContent = m.fecha;
+
+  var todosHechos = e.diag && e.res && e.entregable;
+  var estadoEl = document.getElementById('top-estado');
+  estadoEl.textContent = e.completado ? 'Completado' : todosHechos ? 'Listo' : 'En progreso';
+  estadoEl.className = 'chip ' + (e.completado || todosHechos ? 'chip-ok' : 'chip-pending');
+
+  var html = '';
+
+  if (ROL === 'instructor') {
+    html += '<div style="background:#1C4B9E;border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;color:white;">' +
+      '<div style="font-size:10px;color:#F5C6CE;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:4px;">Panel del Instructor - Modulo ' + m.num + '</div>' +
+      '<div style="font-size:14px;">Gestion de materiales, calificaciones y entregas</div>' +
+      '<div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;">' +
+      '<button class="btn btn-rojo" onclick="mostrarToast(\'Abre Drive para agregar material\')">+ Agregar material</button>' +
+      '<button class="btn btn-rojo" onclick="verPanel()">Panel completo</button>' +
+      '</div></div>';
+  }
+
+  html += '<div class="mod-header">' +
+    '<div>' +
+    '<div class="mod-session">' + m.sesion + '</div>' +
+    '<div class="mod-titulo">' + m.titulo + '</div>' +
+    '<div class="mod-sub">' + m.sub + '</div>' +
+    '<div class="mod-entregable">Entregable: ' + m.entregable + '</div>' +
+    '</div>' +
+    '<div style="text-align:right;flex-shrink:0;">' +
+    '<div class="mod-horas">' + m.horas + '</div>' +
+    '<div class="mod-horas-label">hora de clase</div>' +
+    '</div></div>';
+
+  html += '<div class="material-card"><div class="section-label">Material de la sesion</div>';
+  m.material.forEach(function(mat) {
+    var icono = mat.tipo === 'video' ? '&#9654;' : mat.tipo === 'ppt' ? '&#128202;' : '&#128196;';
+    var bg = mat.tipo === 'video' ? '#1C4B9E' : mat.tipo === 'ppt' ? '#FDF0F2' : '#E8EDF8';
+    html += '<div class="mat-item" onclick="abrirMaterial(\'' + mat.url + '\',\'' + mat.titulo + '\')">' +
+      '<div class="mat-icon" style="background:' + bg + ';color:' + (mat.tipo==='video'?'white':'#1C2B4A') + ';">' + icono + '</div>' +
+      '<div><div class="mat-titulo">' + mat.titulo + '</div><div class="mat-desc">' + mat.desc + '</div></div>' +
+      '<div class="mat-abrir">Abrir</div>' +
+      '</div>';
+  });
+  html += '</div>';
+
+  html += '<div class="actividades">' +
+    tarjetaActividad('diagnostica', i, m, e) +
+    tarjetaActividad('resultados', i, m, e) +
+    tarjetaActividad('entregable', i, m, e) +
+    '</div>';
+
+  document.getElementById('contenido').innerHTML = html;
+  actualizarBarraCompletar(i);
+}
+
+function tarjetaActividad(tipo, i, m, e) {
+  var configs = {
+    diagnostica: {
+      badge: 'badge-diag', label: 'Evaluacion Diagnostica',
+      titulo: 'Diagnostica',
+      desc: 'Evalua conocimientos previos. No afecta calificacion. 5 preguntas.',
+      hecho: e.diag, url: m.formDiag, btnLabel: 'Abrir en Google Forms'
+    },
+    resultados: {
+      badge: 'badge-res', label: 'Evaluacion de Resultados',
+      titulo: 'Evaluacion de Resultados',
+      desc: 'Calificacion minima: 70/100. Cuenta para rubrica Coparmex.',
+      hecho: e.res, url: m.formRes, btnLabel: 'Abrir en Google Forms'
+    },
+    entregable: {
+      badge: 'badge-ent', label: 'Entregable',
+      titulo: 'Subir entregable',
+      desc: m.entregable + '. Sube a la carpeta Drive del modulo.',
+      hecho: e.entregable, url: m.carpeta, btnLabel: 'Abrir carpeta Drive'
+    }
+  };
+  var c = configs[tipo];
+  var bloq = !e.desbloqueado && ROL !== 'instructor';
+  return '<div class="act-card' + (c.hecho ? ' hecho' : '') + '" ' + (bloq ? 'style="opacity:0.5;pointer-events:none;"' : '') + '>' +
+    '<div><span class="badge ' + (c.hecho ? 'badge-ok' : c.badge) + '">' + (c.hecho ? 'Completado' : c.label) + '</span></div>' +
+    '<div class="act-titulo">' + c.titulo + '</div>' +
+    '<div class="act-desc">' + c.desc + '</div>' +
+    '<div class="act-footer">' +
+    '<span class="act-estado' + (c.hecho ? ' hecho' : '') + '">' + (c.hecho ? 'Completado' : 'Pendiente') + '</span>' +
+    '<div style="display:flex;gap:6px;">' +
+    '<a class="btn btn-azul" href="' + c.url + '" target="_blank">' + c.btnLabel + '</a>' +
+    ((!c.hecho && ROL !== 'instructor') ? '<button class="btn btn-verde" onclick="marcar(\'' + tipo + '\',' + i + ')">Marcar</button>' : '') +
+    '</div></div></div>';
+}
+
+function marcar(tipo, i) {
+  if (tipo === 'diagnostica') ESTADO[i].diag = true;
+  if (tipo === 'resultados')  ESTADO[i].res  = true;
+  if (tipo === 'entregable')  ESTADO[i].entregable = true;
+  actualizarBarraCompletar(i);
+  verModulo(i);
+  mostrarToast('Actividad marcada como completada');
+}
+
+function actualizarBarraCompletar(i) {
+  var e = ESTADO[i];
+  var pasos = [e.diag, e.res, e.entregable];
+  var html = '';
+  pasos.forEach(function(p) { html += '<div class="paso ' + (p ? 'hecho' : '') + '"></div>'; });
+  document.getElementById('pasos-mini').innerHTML = html;
+  var todos = e.diag && e.res && e.entregable;
+  document.getElementById('completar-label').textContent = todos
+    ? 'Todo listo! Puedes completar el modulo.'
+    : 'Pendiente: ' + (['Diagnostica','Resultados','Entregable'].filter(function(_, j){ return !pasos[j]; }).join(', '));
+  var btn = document.getElementById('btn-completar');
+  btn.disabled = !todos || e.completado;
+  btn.textContent = e.completado ? 'Modulo completado' : 'Completar modulo';
+}
+
+function completarModulo() {
+  var i = MOD_ACTUAL;
+  ESTADO[i].completado = true;
+  if (i + 1 < 11) ESTADO[i + 1].desbloqueado = true;
+  construirNav();
+  actualizarBarraCompletar(i);
+  document.getElementById('m-icono').textContent = 'Trophy';
+  document.getElementById('m-titulo').textContent = 'Modulo ' + (i+1) + ' completado!';
+  document.getElementById('m-cuerpo').textContent = i + 1 < 11
+    ? 'Excelente trabajo. El Modulo ' + (i+2) + ' esta ahora desbloqueado.'
+    : 'Felicidades! Completaste todos los modulos del programa.';
+  document.getElementById('modal').className = 'modal-fondo abierto';
+}
+
+function cerrarModal() {
+  document.getElementById('modal').className = 'modal-fondo';
+  verRubrica();
+}
+
+function siguienteModulo() {
+  document.getElementById('modal').className = 'modal-fondo';
+  var siguiente = MOD_ACTUAL + 1;
+  if (siguiente < 11) verModulo(siguiente);
+}
+
+function verRubrica() {
+  document.getElementById('top-titulo').textContent = 'Rubrica Coparmex';
+  document.getElementById('top-meta').textContent = 'Reporte del grupo';
+  document.getElementById('top-fecha').textContent = '';
+  document.getElementById('top-estado').textContent = '';
+  document.getElementById('barra-completar').style.display = 'none';
+  var alumnos = ALUMNOS.length > 0 ? ALUMNOS : [
+    {nombre:'(Alumno 1)', empresa:'-'}, {nombre:'(Alumno 2)', empresa:'-'},
+    {nombre:'(Alumno 3)', empresa:'-'}
+  ];
+  var cols = MODULOS.map(function(m){ return '<th style="background:#1C4B9E;color:rgba(255,255,255,0.8);padding:8px;font-size:11px;white-space:nowrap;">M' + m.num + '</th>'; }).join('');
+  var filas = alumnos.map(function(a) {
+    var celdas = MODULOS.map(function(){ return '<td style="padding:8px;border-bottom:1px solid rgba(28,75,158,0.08);text-align:center;font-size:11px;color:#5A6A8A;">-</td>'; }).join('');
+    return '<tr><td style="padding:8px;border-bottom:1px solid rgba(28,75,158,0.08);font-weight:600;">' + a.nombre + '</td>' +
+      '<td style="padding:8px;border-bottom:1px solid rgba(28,75,158,0.08);font-size:11px;color:#5A6A8A;">' + a.empresa + '</td>' +
+      celdas + '<td style="padding:8px;border-bottom:1px solid rgba(28,75,158,0.08);">-</td></tr>';
+  }).join('');
+  document.getElementById('contenido').innerHTML =
+    '<div style="background:white;border-radius:14px;border:1px solid rgba(28,75,158,0.1);overflow:hidden;box-shadow:0 2px 12px rgba(28,75,158,0.06);">' +
+    '<div style="padding:1.25rem 1.5rem;border-bottom:1px solid rgba(28,75,158,0.1);display:flex;align-items:center;justify-content:space-between;">' +
+    '<div><div style="font-size:20px;font-weight:700;color:#1C4B9E;">Rubrica Coparmex</div>' +
+    '<div style="font-size:13px;color:#5A6A8A;margin-top:2px;">Calificaciones por alumno y modulo</div></div>' +
+    '<button class="btn btn-azul" onclick="exportarCSV()">Exportar CSV</button></div>' +
+    '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">' +
+    '<thead><tr><th style="background:#1C4B9E;color:#F5C6CE;padding:8px;text-align:left;">Alumno</th>' +
+    '<th style="background:#1C4B9E;color:rgba(255,255,255,0.7);padding:8px;text-align:left;">Empresa</th>' +
+    cols + '<th style="background:#1C4B9E;color:rgba(255,255,255,0.8);padding:8px;font-size:11px;">Promedio</th></tr></thead>' +
+    '<tbody>' + filas + '</tbody></table></div></div>';
+}
+
+function verPanel() {
+  document.getElementById('top-titulo').textContent = 'Panel del Instructor';
+  document.getElementById('top-meta').textContent = 'Alumnos - Materiales - Calificaciones - Notificaciones';
+  document.getElementById('top-fecha').textContent = '';
+  document.getElementById('top-estado').textContent = '';
+  document.getElementById('barra-completar').style.display = 'none';
+  document.getElementById('contenido').innerHTML =
+    '<div style="background:white;border-radius:14px;border:1px solid rgba(28,75,158,0.1);padding:1.5rem;box-shadow:0 2px 12px rgba(28,75,158,0.06);margin-bottom:1rem;">' +
+    '<div style="font-size:16px;font-weight:700;color:#1C4B9E;margin-bottom:1rem;">Agregar alumno</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">' +
+    '<div><label style="font-size:11px;font-weight:600;color:#5A6A8A;text-transform:uppercase;display:block;margin-bottom:4px;">Nombre</label>' +
+    '<input id="p-nombre" type="text" placeholder="Nombre completo" style="width:100%;padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,75,158,0.2);font-family:Montserrat,Arial,sans-serif;font-size:13px;outline:none;box-sizing:border-box;"></div>' +
+    '<div><label style="font-size:11px;font-weight:600;color:#5A6A8A;text-transform:uppercase;display:block;margin-bottom:4px;">Empresa</label>' +
+    '<input id="p-empresa" type="text" placeholder="Empresa" style="width:100%;padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,75,158,0.2);font-family:Montserrat,Arial,sans-serif;font-size:13px;outline:none;box-sizing:border-box;"></div>' +
+    '<div><label style="font-size:11px;font-weight:600;color:#5A6A8A;text-transform:uppercase;display:block;margin-bottom:4px;">Email Gmail</label>' +
+    '<input id="p-email" type="email" placeholder="alumno@gmail.com" style="width:100%;padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,75,158,0.2);font-family:Montserrat,Arial,sans-serif;font-size:13px;outline:none;box-sizing:border-box;"></div>' +
+    '<div><label style="font-size:11px;font-weight:600;color:#5A6A8A;text-transform:uppercase;display:block;margin-bottom:4px;">Giro</label>' +
+    '<input id="p-giro" type="text" placeholder="Servicios, Industria..." style="width:100%;padding:8px 12px;border-radius:8px;border:1.5px solid rgba(28,75,158,0.2);font-family:Montserrat,Arial,sans-serif;font-size:13px;outline:none;box-sizing:border-box;"></div>' +
+    '</div>' +
+    '<button class="btn btn-azul" onclick="guardarAlumno()">Guardar alumno</button>' +
+    '</div>' +
+    '<div style="background:white;border-radius:14px;border:1px solid rgba(28,75,158,0.1);padding:1.5rem;box-shadow:0 2px 12px rgba(28,75,158,0.06);">' +
+    '<div style="font-size:16px;font-weight:700;color:#1C4B9E;margin-bottom:1rem;">Alumnos registrados (' + ALUMNOS.length + ')</div>' +
+    '<div id="lista-alumnos">' + (ALUMNOS.length === 0
+      ? '<p style="color:#5A6A8A;font-size:14px;">Aun no hay alumnos. Agrega el primero arriba.</p>'
+      : ALUMNOS.map(function(a,i){ return '<div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid rgba(28,75,158,0.1);border-radius:8px;margin-bottom:6px;">' +
+        '<div style="width:34px;height:34px;border-radius:50%;background:#E8EDF8;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1C4B9E;flex-shrink:0;">' + a.nombre.split(' ').slice(0,2).map(function(w){return w[0];}).join('') + '</div>' +
+        '<div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#1C2B4A;">' + a.nombre + '</div><div style="font-size:11px;color:#5A6A8A;">' + a.empresa + ' - ' + (a.email||'sin email') + '</div></div>' +
+        '<button class="btn btn-rojo" onclick="eliminarAlumno(' + i + ')">Eliminar</button></div>'; }).join('')
+    ) + '</div></div>';
+}
+
+function guardarAlumno() {
+  var n = document.getElementById('p-nombre').value.trim();
+  var e = document.getElementById('p-empresa').value.trim();
+  var em = document.getElementById('p-email').value.trim();
+  var g = document.getElementById('p-giro').value.trim();
+  if (!n || !e) { alert('Nombre y empresa son obligatorios'); return; }
+  ALUMNOS.push({nombre: n, empresa: e, email: em, giro: g});
+  mostrarToast('Alumno ' + n + ' agregado');
+  verPanel();
+}
+
+function eliminarAlumno(i) {
+  if (confirm('Eliminar a ' + ALUMNOS[i].nombre + '?')) {
+    ALUMNOS.splice(i, 1);
+    verPanel();
+  }
+}
+
+function abrirMaterial(url, titulo) {
+  if (url && url.length > 5) {
+    window.open(url, '_blank');
+  } else {
+    mostrarToast('Material pendiente - la instructora lo subira antes de la sesion.');
+  }
+}
+
+function exportarCSV() {
+  var csv = 'Alumno,Empresa,' + MODULOS.map(function(m){return 'M'+m.num;}).join(',') + ',Promedio\n';
+  (ALUMNOS.length > 0 ? ALUMNOS : [{nombre:'Alumno demo',empresa:'Empresa demo'}]).forEach(function(a) {
+    csv += a.nombre + ',' + a.empresa + ',' + MODULOS.map(function(){return '-';}).join(',') + ',-\n';
+  });
+  var link = document.createElement('a');
+  link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  link.download = 'Rubrica_Coparmex_RSE.csv';
+  link.click();
+}
+
+function mostrarToast(msg) {
+  var t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(function(){ t.remove(); }, 300); }, 3500);
+}
+</script>
+</body>
+</html>
